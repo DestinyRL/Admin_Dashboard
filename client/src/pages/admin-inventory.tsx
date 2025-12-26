@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { useCloudinary } from "@/hooks/use-cloudinary-upload";
+import { useCloudinaryUpload } from "@/hooks/use-cloudinary-upload"; // Updated import name
 import { Plus, Edit2, Trash2, X, Upload, AlertCircle } from "lucide-react";
 import type { MenuItem } from "@shared/schema";
 import {
@@ -55,23 +55,23 @@ export default function AdminInventoryPage() {
     stockQuantity: 0,
     sku: "",
   });
-  const [uploadingImage, setUploadingImage] = useState(false);
 
-  // Replace your old state and useUpload with this:
-const { uploadFile, isUploading: uploadingImage } = useCloudinaryUpload({
-  onSuccess: (url) => {
-    setFormData(prev => ({ ...prev, imageUrl: url }));
-    toast({ title: "Image uploaded successfully" });
-  },
-  onError: (error) => {
-    toast({
-      title: "Upload failed",
-      description: error.message,
-      variant: "destructive",
-    });
-  },
-});
+  // REMOVED: const [uploadingImage, setUploadingImage] = useState(false);
+  // The line above was causing the "Already Declared" error.
 
+  const { uploadFile, isUploading: uploadingImage } = useCloudinaryUpload({
+    onSuccess: (url) => {
+      setFormData(prev => ({ ...prev, imageUrl: url }));
+      toast({ title: "Image uploaded successfully" });
+    },
+    onError: (error) => {
+      toast({
+        title: "Upload failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
 
   const { data: items = [], isLoading } = useQuery({
     queryKey: ["/api/menu"],
@@ -190,7 +190,7 @@ const { uploadFile, isUploading: uploadingImage } = useCloudinaryUpload({
       return;
     }
 
-    setUploadingImage(true);
+    // Call the hook function directly
     await uploadFile(file);
   };
 
@@ -238,7 +238,6 @@ const { uploadFile, isUploading: uploadingImage } = useCloudinaryUpload({
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/30">
       <div className="max-w-7xl mx-auto p-4 md:p-8">
-        {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">Inventory Management</h1>
@@ -255,7 +254,6 @@ const { uploadFile, isUploading: uploadingImage } = useCloudinaryUpload({
           </Button>
         </div>
 
-        {/* Products Grid */}
         {Object.entries(groupedByCategory).length === 0 ? (
           <Card className="p-12 text-center">
             <p className="text-muted-foreground mb-4">No products yet</p>
@@ -277,22 +275,14 @@ const { uploadFile, isUploading: uploadingImage } = useCloudinaryUpload({
                     className="overflow-hidden hover-elevate transition-all"
                     data-testid={`card-inventory-${item.id}`}
                   >
-                    {/* Product Image */}
                     <div className="aspect-video bg-muted overflow-hidden">
-                      {item.imageUrl.startsWith("/objects/") ? (
-                        <img
-                          src={item.imageUrl}
-                          alt={item.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-muted">
-                          <AlertCircle className="w-8 h-8 text-muted-foreground" />
-                        </div>
-                      )}
+                      <img
+                        src={item.imageUrl}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
 
-                    {/* Product Info */}
                     <div className="p-4 md:p-6">
                       <h3 className="text-lg font-semibold text-foreground mb-1">
                         {item.name}
@@ -301,7 +291,6 @@ const { uploadFile, isUploading: uploadingImage } = useCloudinaryUpload({
                         {item.description}
                       </p>
 
-                      {/* Price and Stock */}
                       <div className="flex items-center justify-between mb-4">
                         <div>
                           <p className="text-xs text-muted-foreground">Price</p>
@@ -319,7 +308,6 @@ const { uploadFile, isUploading: uploadingImage } = useCloudinaryUpload({
                         </div>
                       </div>
 
-                      {/* Availability Badge */}
                       <div className="mb-4 flex items-center gap-2">
                         <div className={`w-2 h-2 rounded-full ${
                           item.available ? "bg-green-500" : "bg-red-500"
@@ -329,7 +317,6 @@ const { uploadFile, isUploading: uploadingImage } = useCloudinaryUpload({
                         </span>
                       </div>
 
-                      {/* Actions */}
                       <div className="flex gap-2">
                         <Button
                           onClick={() => handleEditClick(item)}
@@ -361,7 +348,6 @@ const { uploadFile, isUploading: uploadingImage } = useCloudinaryUpload({
         )}
       </div>
 
-      {/* Add Product Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent className="max-w-2xl w-[95vw] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -477,7 +463,7 @@ const { uploadFile, isUploading: uploadingImage } = useCloudinaryUpload({
             </Button>
             <Button
               onClick={handleSubmitAdd}
-              disabled={createMutation.isPending}
+              disabled={createMutation.isPending || uploadingImage}
               data-testid="button-submit-add"
             >
               {createMutation.isPending ? "Adding..." : "Add Product"}
@@ -486,7 +472,6 @@ const { uploadFile, isUploading: uploadingImage } = useCloudinaryUpload({
         </DialogContent>
       </Dialog>
 
-      {/* Edit Product Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-w-2xl w-[95vw] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -601,7 +586,7 @@ const { uploadFile, isUploading: uploadingImage } = useCloudinaryUpload({
             </Button>
             <Button
               onClick={handleSubmitEdit}
-              disabled={updateMutation.isPending}
+              disabled={updateMutation.isPending || uploadingImage}
               data-testid="button-submit-edit"
             >
               {updateMutation.isPending ? "Saving..." : "Save Changes"}
@@ -610,7 +595,6 @@ const { uploadFile, isUploading: uploadingImage } = useCloudinaryUpload({
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation Dialog */}
       <Dialog open={deleteConfirmId !== null} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
         <DialogContent>
           <DialogHeader>
