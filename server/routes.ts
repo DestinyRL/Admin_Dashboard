@@ -3,7 +3,8 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { api } from "@shared/routes";
 import { z } from "zod";
-import { registerObjectStorageRoutes } from "./replit_integrations/object_storage";
+import { v2 as cloudinary } from "cloudinary";
+
 
 // Hardcoded credentials
 const ADMIN_USERNAME = "admin_orderflow";
