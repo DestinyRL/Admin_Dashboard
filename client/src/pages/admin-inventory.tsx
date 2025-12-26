@@ -57,21 +57,21 @@ export default function AdminInventoryPage() {
   });
   const [uploadingImage, setUploadingImage] = useState(false);
 
-  const { uploadFile } = useUpload({
-    onSuccess: (response) => {
-      setFormData({ ...formData, imageUrl: response.objectPath });
-      setUploadingImage(false);
-      toast({ title: "Image uploaded successfully" });
-    },
-    onError: (error) => {
-      setUploadingImage(false);
-      toast({
-        title: "Upload failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
+  // Replace your old state and useUpload with this:
+const { uploadFile, isUploading: uploadingImage } = useCloudinaryUpload({
+  onSuccess: (url) => {
+    setFormData(prev => ({ ...prev, imageUrl: url }));
+    toast({ title: "Image uploaded successfully" });
+  },
+  onError: (error) => {
+    toast({
+      title: "Upload failed",
+      description: error.message,
+      variant: "destructive",
+    });
+  },
+});
+
 
   const { data: items = [], isLoading } = useQuery({
     queryKey: ["/api/menu"],
