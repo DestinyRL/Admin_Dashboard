@@ -53,6 +53,26 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     res.json({ message: "Logged out" });
   });
 
+  // Image Upload Route
+  app.post("/api/upload", isAuthenticated, async (req, res) => {
+    try {
+      const { image } = req.body; // Expecting a base64 string or file buffer
+      if (!image) {
+        return res.status(400).json({ message: "No image data provided" });
+      }
+
+      const uploadResponse = await cloudinary.uploader.upload(image, {
+        folder: "orderflow_products",
+      });
+
+      res.json({ url: uploadResponse.secure_url });
+    } catch (err) {
+      console.error("Cloudinary upload error:", err);
+      res.status(500).json({ message: "Failed to upload image" });
+    }
+  });
+
+
   // Menu Items
   app.get(api.menu.list.path, async (req, res) => {
     const items = await storage.getMenuItems();
