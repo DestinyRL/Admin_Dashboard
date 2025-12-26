@@ -20,11 +20,13 @@ const isAuthenticated: RequestHandler = (req, res, next) => {
   res.status(401).json({ message: "Unauthorized" });
 };
 
-export async function registerRoutes(
-  httpServer: Server,
-  app: Express
-): Promise<Server> {
-  registerObjectStorageRoutes(app);
+export async function registerRoutes(httpServer: Server, app: Express): Promise<Server> {
+  // Add this line
+  cloudinary.config(); 
+  
+  // Find and DELETE or COMMENT OUT this line:
+  // registerObjectStorageRoutes(app);
+
 
   // Auth routes
   app.post("/api/auth/login", async (req, res) => {
