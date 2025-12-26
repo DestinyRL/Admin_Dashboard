@@ -15,6 +15,8 @@ export default defineConfig({
   },
   root: path.resolve(import.meta.dirname, "client"),
   build: {
+    // This path ensures your frontend is built into the correct 
+    // folder for the Express server to serve it on Render.
     outDir: path.resolve(import.meta.dirname, "../dist/public"),
     emptyOutDir: true,
   },
