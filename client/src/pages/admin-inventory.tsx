@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { useUpload } from "@/hooks/use-upload";
+import { useCloudinary } from "@/hooks/use-cloudinary";
 import { Plus, Edit2, Trash2, X, Upload, AlertCircle } from "lucide-react";
 import type { MenuItem } from "@shared/schema";
 import {
